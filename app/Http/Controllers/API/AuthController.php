@@ -29,16 +29,16 @@ class AuthController extends Controller
             return response()->json([
                 'status' => 'false',
                 'message' => 'invalide users login',
-                'error' => $ValidateUser->error()->all(),
+                'error' => $ValidateUser->errors()->all(),
             ], 401);
         };
-  // otherwise store in db
+        // otherwise store in db
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => $request->password
+            'password' => bcrypt($request->password)
         ]);
-// and return json
+        // and return json
         return response()->json([
             'status' => 'true',
             'message' => 'User Login  Created Successfully',
@@ -72,16 +72,16 @@ class AuthController extends Controller
             ], 404);
         };
 
-        if(Auth::attempt(['email'=>$request->email, 'password'=>$request->password])){
+        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $authUser = Auth::user();
             return response()->json([
-            'status' => 'true',
-            'message' => 'User Login  Created Successfully',
-            'token' => $authUser->createToken("API Token")->plainTextToken,
-            'token_type' => 'bearer', 
-        ],200);
-        }else{
-             return response()->json([
+                'status' => 'true',
+                'message' => 'User Login  Created Successfully',
+                'token' => $authUser->createToken("API Token")->plainTextToken,
+                'token_type' => 'bearer',
+            ], 200);
+        }else {
+            return response()->json([
                 'status' => 'false',
                 'message' => 'Email and password does not match',
             ], 401);
@@ -91,15 +91,16 @@ class AuthController extends Controller
 
 
     //logout
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
         $user  = $request->user();
-        $user()->tokens()->delete();
+       $request->user()->tokens()->delete();
 
         return response()->json([
             'status' => 'true',
             'user' => $user,
             'message' => 'User Logout   Successfully',
-            
+
         ], 200);
     }
 }
