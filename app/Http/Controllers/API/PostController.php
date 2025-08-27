@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+
+use App\Http\Controllers\API\BaseController;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use Illuminate\Support\Facades\Validator;
 
-class PostController extends Controller
+class PostController extends BaseController
 {
 
     /**
@@ -15,13 +17,15 @@ class PostController extends Controller
      */
     public function index()
     {
-        $data['$post'] = Post::all();
+        $data['$posts'] = Post::all();
 
-        return response()->json([
-            'status' => 'true',
-            'message' => 'All Post Data',
-            'data' => $data,
-        ], 200);
+        // return response()->json([
+        //     'status' => 'true',
+        //     'message' => 'All Post Data',
+        //     'data' => $data,
+        // ], 200);
+
+        return  $this()->sendResponce($data, 'All Post Data');
     }
 
     /**
@@ -35,29 +39,55 @@ class PostController extends Controller
             $request->all(),
             [
                 'title' => 'required',
-                'description' => 'required|email|unique:users,email',
+                'description' => 'required',
                 'image' => 'required|mimes:png,jpg,jpeg,gif',
             ]
         );
 
         //agr fail hn gyi request
         if ($ValidateUser->fails()) {
-            return response()->json([
-                'status' => 'false',
-                'message' => 'invalide users login',
-                'error' => $ValidateUser->errors()->all(),
-            ], 401);
-        };
-        $post = Post::select('id', 'image')->get();
+            // return response()->json([
+            //     'status' => 'false',
+            //     'message' => 'invalide users login',
+            //     'error' => $ValidateUser->errors()->all(),
+            // ], 401);
 
-        if($request->image  != ''){
-            
+            //or Short code
+               return  $this()->sendError('Valid error',$ValidateUser->errors()->all());
+        };
+
+
+        //agr image upload kr rahi k tu pahli wali ko remove kr dain 
+        // or agr  nhi kr rahki tu pahlay wali image ko remove kr dain 
+        $post = Post::select('id', 'image')->first();
+        if ($request->image  != '') {
+
+            $path = public_path() . '/uploads';
+
+
+
+            $img = $request->image;  //get image
+            $ext = $img->getClientOriginalExtension();    // get image extentionl like png jpg etc
+            $imageName = time() . '.' . $ext;  // store img with current time + extention
+            $img->move(public_path('/uploads'), $imageName);
+            //move imag with origin extention name
+        } else {
+            $imageName = $post->image;
         }
 
-        $img = $request->image;  //get image
-        $ext = $img->getClientOriginlExtention();    // get image extentionl like png jpg etc
-        $imageName = time() . '.' . $ext;  // store img with current time + extention
-        $img->move(public_path() . '/uploads' . $imageName);  //move imag with origin extention name
+
+
+        // Roman Urdu Flow (Easy Summary)
+
+        // Post ko DB se nikaalo.
+
+        // Check karo new image upload hui hai?
+
+        // Agar hui hai → purani image delete karo → new image uploads folder me save karo.
+
+        // Agar nahi hui → purani image ka naam rehne do.
+
+        // DB me image ka naam update karke save kar do
 
 
 
@@ -71,11 +101,13 @@ class PostController extends Controller
 
 
         // and return json
-        return response()->json([
-            'status' => 'true',
-            'message' => 'Post Created Successfully',
-            'user' => $post,
-        ], 200);
+        // return response()->json([
+        //     'status' => 'true',
+        //     'message' => 'Post Created Successfully',
+        //     'user' => $post,
+        // ], 200);
+
+        return  $this()->sendResponce($post, 'Post Created Successfully');
     }
 
     /**
@@ -92,11 +124,13 @@ class PostController extends Controller
         )->where(['id' => $id])->get();
 
         // and return json
-        return response()->json([
-            'status' => 'true',
-            'message' => 'Your Single Post Created Successfully',
-            'data' => $data,
-        ], 200);
+        // return response()->json([
+        //     'status' => 'true',
+        //     'message' => 'Your Single Post Created Successfully',
+        //     'data' => $data,
+        // ], 200);
+
+        return  $this()->sendResponce($data, 'Your Single Post Created Successfully');
     }
 
     /**
@@ -104,27 +138,30 @@ class PostController extends Controller
      */
     public function update(Request $request, string $id)
     {
+
         $ValidateUser = Validator::make(
             $request->all(),
             [
                 'title' => 'required',
-                'description' => 'required|email|unique:users,email',
+                'description' => 'required',
                 'image' => 'required|mimes:png,jpg,jpeg,gif',
             ]
         );
 
+
         //agr fail hn gyi request
         if ($ValidateUser->fails()) {
-            return response()->json([
-                'status' => 'false',
-                'message' => 'invalide users login',
-                'error' => $ValidateUser->errors()->all(),
-            ], 401);
+            // return response()->json([
+            //     'status' => 'false',
+            //     'message' => 'invalide users login',
+            //     'error' => $ValidateUser->errors()->all(),
+            // ], 401);
+                     return  $this()->sendError('Valid error',$ValidateUser->errors()->all());
         };
 
 
         $img = $request->image;  //get image
-        $ext = $img->getClientOriginlExtention(); // get image extentionl like png jpg etc
+        $ext = $img->getClientOriginalExtension(); // get image extentionl like png jpg etc
         $imageName = time() . '.' . $ext;  // store img with current time + extention
         $img->move(public_path() . '/uploads' . $imageName);  //move imag with origin extention name
 
@@ -140,11 +177,13 @@ class PostController extends Controller
 
 
         // and return json
-        return response()->json([
-            'status' => 'true',
-            'message' => 'Post Created Successfully',
-            'user' => $post,
-        ], 200);
+        // return response()->json([
+        //     'status' => 'true',
+        //     'message' => 'Post Update Successfully',
+        //     'user' => $post,
+        // ], 200);
+
+        return  $this()->sendResponce($post, 'Post Update Successfully');
     }
 
     /**
@@ -152,6 +191,40 @@ class PostController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+
+        $post = Post::find($id);
+
+        // Agar post hi nahi mili
+        if (!$post) {
+            return response()->json([
+                'status' => 'false',
+                'message' => 'Post not found',
+            ], 404);
+        }
+
+        // Agar image exist karti hai to delete karo
+        if ($post->image) {
+            $filepath = public_path('uploads/' . $post->image);
+            if (file_exists($filepath)) {
+                unlink($filepath);
+            }
+        }
+
+        // DB se post delete karo
+        $post->delete();
+
+        // return response()->json([
+        //     'status' => 'true',
+        //     'message' => 'Your Post has been removed Successfully',
+
+        // ], 200);
+        return  $this()->sendResponce($post, 'Your Post has been removed Successfully');
+
+        //Step 1: Database se us post ki image ka naam lo (jo id ke saath match karta hai).
+        //Step 2: Image ka full path banao (public/uploads + image name).
+        //Step 3: Us image ko server se delete karo (unlink).
+        //Step 4: Post record ko database se delete karo.
+        //JSON response bhejo → confirm karo ke post aur uski image successfully remove ho gayi.
+
     }
 }
