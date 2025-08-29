@@ -25,7 +25,7 @@ class PostController extends BaseController
         //     'data' => $data,
         // ], 200);
 
-        return  $this()->sendResponce($data, 'All Post Data');
+        return  $this()->sendResponse($data, 'All Post Data');
     }
 
     /**
@@ -102,7 +102,7 @@ class PostController extends BaseController
         //     'user' => $post,
         // ], 200);
 
-        return  $this()->sendResponce($post, 'Post Created Successfully');
+        return  $this()->sendResponse($post, 'Post Created Successfully');
     }
 
     /**
@@ -125,7 +125,7 @@ class PostController extends BaseController
         //     'data' => $data,
         // ], 200);
 
-        return  $this()->sendResponce($data, 'Your Single Post Created Successfully');
+        return  $this()->sendResponse($data, 'Your Single Post Created Successfully');
     }
 
     /**
@@ -178,7 +178,7 @@ class PostController extends BaseController
         //     'user' => $post,
         // ], 200);
 
-        return  $this()->sendResponce($post, 'Post Update Successfully');
+        return  $this()->sendResponse($post, 'Post Update Successfully');
     }
 
     /**
@@ -213,7 +213,7 @@ class PostController extends BaseController
         //     'message' => 'Your Post has been removed Successfully',
 
         // ], 200);
-        return  $this()->sendResponce($post, 'Your Post has been removed Successfully');
+        return  $this()->sendResponse($post, 'Your Post has been removed Successfully');
 
         //Step 1: Database se us post ki image ka naam lo (jo id ke saath match karta hai).
         //Step 2: Image ka full path banao (public/uploads + image name).

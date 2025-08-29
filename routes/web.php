@@ -7,6 +7,10 @@ Route::get('/', function () {
     return view('login');
 });
 
+Route::get('/allpost', function () {
+    return view('allpost');  // matches resources/views/allpost.blade.php
+})->name('allpost');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
