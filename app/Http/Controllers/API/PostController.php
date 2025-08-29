@@ -53,7 +53,7 @@ class PostController extends BaseController
             // ], 401);
 
             //or Short code
-               return  $this()->sendError('Valid error',$ValidateUser->errors()->all());
+            return  $this()->sendError('Valid error', $ValidateUser->errors()->all());
         };
 
 
@@ -75,21 +75,16 @@ class PostController extends BaseController
             $imageName = $post->image;
         }
 
-
-
+        // Agar new image aayi hai:
+        // Uska extension lo (jpg, png, etc).
+        // Ek unique naam banao (time() + extension).
+        // Image ko public/uploads folder me move kar do.
         // Roman Urdu Flow (Easy Summary)
-
         // Post ko DB se nikaalo.
-
         // Check karo new image upload hui hai?
-
         // Agar hui hai → purani image delete karo → new image uploads folder me save karo.
-
         // Agar nahi hui → purani image ka naam rehne do.
-
         // DB me image ka naam update karke save kar do
-
-
 
 
         // otherwise store in db
@@ -156,7 +151,7 @@ class PostController extends BaseController
             //     'message' => 'invalide users login',
             //     'error' => $ValidateUser->errors()->all(),
             // ], 401);
-                     return  $this()->sendError('Valid error',$ValidateUser->errors()->all());
+            return  $this()->sendError('Valid error', $ValidateUser->errors()->all());
         };
 
 
