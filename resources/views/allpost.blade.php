@@ -248,7 +248,7 @@
             <div class="toolbar">
                 <h1>All Post</h1>
                 <div class="actions">
-                    <a class="btn primary" href="#" aria-label="Add New Post">➕ Add New</a>
+                    <a class="btn primary" href="{{route('addpost')}}" aria-label="Add New Post">➕ Add New</a>
                     <button class="btn danger" id="logoutBtn" aria-label="Logout">⏻ Logout</button>
                 </div>
             </div>
@@ -314,6 +314,7 @@
 
     <script>
         function loadData() {
+
             const token = localStorage.getItem('api_token');
 
             if (!token) {
@@ -330,10 +331,12 @@
                     , }
                 })
                 .then(response => {
-                    if (!response.ok) {
+
+                    if(!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
                     return response.json();
+
                 })
                 .then(data => {
 
@@ -407,7 +410,7 @@
                     return;
                 }
                 // Fetch the single post from backend
-                fetch(`/api/posts/${id}`, {
+                fetch(`/api/posts/${id}`,{
                         method: 'GET',
                          headers: {
                             'Authorization': `Bearer ${token}`,
@@ -430,6 +433,7 @@
                         `;
                     });
             });
+
         }
     </script>
 
