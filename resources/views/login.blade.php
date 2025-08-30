@@ -170,6 +170,7 @@
                 align-items: flex-start;
             }
         }
+
     </style>
 </head>
 
@@ -217,40 +218,38 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 
-<script>
-$(document).ready(function () {
-    // attach submit event to form, not button
-    $("#loginForm").on("submit", function (e) {
-        e.preventDefault();
+    <script>
+        $(document).ready(function() {
+            // attach submit event to form, not button
+            $("#loginForm").on("submit", function(e) {
+                e.preventDefault();
 
-        let email = $("#email").val();
-        let password = $("#password").val();
+                let email = $("#email").val();
+                let password = $("#password").val();
 
-        $.ajax({
-            url: '/api/login',
-            type: 'POST',
-            contentType: 'application/json',
-            processData: false, // important for JSON
-            data: JSON.stringify({
-                email: email,
-                password: password
-            }),
-            success: function (response) {
-                console.log(response);
+                $.ajax({
+                    url: '/api/login',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    processData: false, // important for JSON
+                    data: JSON.stringify({
+                        email: email,
+                        password: password
+                    }),
+                    success: function(response) {
+                        console.log(response);
 
-                localStorage.setItem('api_token', response.token);
-              window.location.href = "{{ route('allpost') }}";
-
-
-            },
-            error: function (xhr) {
-                console.log("Error:", xhr.responseText);
-               
-            }
+                        localStorage.setItem('api_token', response.token);
+                        window.location.href = "{{ route('allpost') }}";
+                    },
+                    error: function(xhr) {
+                        console.log("Error:", xhr.responseText);
+                    }
+                });
+            });
         });
-    });
-});
-</script>
+
+    </script>
 
 
 </body>

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-
 use App\Http\Controllers\API\BaseController;
 use Illuminate\Http\Request;
 use App\Models\Post;
@@ -17,7 +16,7 @@ class PostController extends BaseController
      */
     public function index()
     {
-        $data['$posts'] = Post::all();
+        $data['posts'] = Post::all();
 
         // return response()->json([
         //     'status' => 'true',
@@ -25,16 +24,14 @@ class PostController extends BaseController
         //     'data' => $data,
         // ], 200);
 
-        return  $this()->sendResponse($data, 'All Post Data');
+        return $this->sendResponse($data, 'All Post Data');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-
     public function store(Request $request)
     {
-
         $ValidateUser = Validator::make(
             $request->all(),
             [
@@ -53,39 +50,18 @@ class PostController extends BaseController
             // ], 401);
 
             //or Short code
-            return  $this()->sendError('Valid error', $ValidateUser->errors()->all());
+            return $this->sendError('Valid error', $ValidateUser->errors()->all());
         };
 
-
-        //agr image upload kr rahi k tu pahli wali ko remove kr dain 
-        // or agr  nhi kr rahki tu pahlay wali image ko remove kr dain 
-        $post = Post::select('id', 'image')->first();
-        if ($request->image  != '') {
-
-            $path = public_path() . '/uploads';
-
-
-
-            $img = $request->image;  //get image
-            $ext = $img->getClientOriginalExtension();    // get image extentionl like png jpg etc
-            $imageName = time() . '.' . $ext;  // store img with current time + extention
-            $img->move(public_path('/uploads'), $imageName);
-            //move imag with origin extention name
+        // Image upload handling
+        if ($request->hasFile('image')) {
+            $img = $request->file('image');  //get image
+            $ext = $img->getClientOriginalExtension();    // get image extension like png jpg etc
+            $imageName = time() . '.' . $ext;  // store img with current time + extension
+            $img->move(public_path('uploads'), $imageName); // move image to uploads folder
         } else {
-            $imageName = $post->image;
+            $imageName = null;
         }
-
-        // Agar new image aayi hai:
-        // Uska extension lo (jpg, png, etc).
-        // Ek unique naam banao (time() + extension).
-        // Image ko public/uploads folder me move kar do.
-        // Roman Urdu Flow (Easy Summary)
-        // Post ko DB se nikaalo.
-        // Check karo new image upload hui hai?
-        // Agar hui hai → purani image delete karo → new image uploads folder me save karo.
-        // Agar nahi hui → purani image ka naam rehne do.
-        // DB me image ka naam update karke save kar do
-
 
         // otherwise store in db
         $post = Post::create([
@@ -94,7 +70,6 @@ class PostController extends BaseController
             'image' => $imageName,
         ]);
 
-
         // and return json
         // return response()->json([
         //     'status' => 'true',
@@ -102,13 +77,12 @@ class PostController extends BaseController
         //     'user' => $post,
         // ], 200);
 
-        return  $this()->sendResponse($post, 'Post Created Successfully');
+        return $this->sendResponse($post, 'Post Created Successfully');
     }
 
     /**
      * Display the specified resource.
      */
-
     public function show(string $id)
     {
         $data['post'] = Post::select(
@@ -116,7 +90,7 @@ class PostController extends BaseController
             'title',
             'description',
             'image',
-        )->where(['id' => $id])->get();
+        )->where(['id' => $id])->first();
 
         // and return json
         // return response()->json([
@@ -125,7 +99,7 @@ class PostController extends BaseController
         //     'data' => $data,
         // ], 200);
 
-        return  $this()->sendResponse($data, 'Your Single Post Created Successfully');
+        return $this->sendResponse($data, 'Your Single Post Created Successfully');
     }
 
     /**
@@ -133,7 +107,6 @@ class PostController extends BaseController
      */
     public function update(Request $request, string $id)
     {
-
         $ValidateUser = Validator::make(
             $request->all(),
             [
@@ -143,7 +116,6 @@ class PostController extends BaseController
             ]
         );
 
-
         //agr fail hn gyi request
         if ($ValidateUser->fails()) {
             // return response()->json([
@@ -151,25 +123,25 @@ class PostController extends BaseController
             //     'message' => 'invalide users login',
             //     'error' => $ValidateUser->errors()->all(),
             // ], 401);
-            return  $this()->sendError('Valid error', $ValidateUser->errors()->all());
+            return $this->sendError('Valid error', $ValidateUser->errors()->all());
         };
 
+        // Image upload handling
+        if ($request->hasFile('image')) {
+            $img = $request->file('image');  //get image
+            $ext = $img->getClientOriginalExtension(); // get image extension like png jpg etc
+            $imageName = time() . '.' . $ext;  // store img with current time + extension
+            $img->move(public_path('uploads'), $imageName);  // move image to uploads folder
+        } else {
+            $imageName = null;
+        }
 
-        $img = $request->image;  //get image
-        $ext = $img->getClientOriginalExtension(); // get image extentionl like png jpg etc
-        $imageName = time() . '.' . $ext;  // store img with current time + extention
-        $img->move(public_path() . '/uploads' . $imageName);  //move imag with origin extention name
-
-
-
-
-        // otherwise store in db
+        // update in db
         $post = Post::where(['id' => $id])->update([
             'title' => $request->title,
             'description' => $request->description,
             'image' => $imageName,
         ]);
-
 
         // and return json
         // return response()->json([
@@ -178,7 +150,7 @@ class PostController extends BaseController
         //     'user' => $post,
         // ], 200);
 
-        return  $this()->sendResponse($post, 'Post Update Successfully');
+        return $this->sendResponse($post, 'Post Update Successfully');
     }
 
     /**
@@ -186,7 +158,6 @@ class PostController extends BaseController
      */
     public function destroy(string $id)
     {
-
         $post = Post::find($id);
 
         // Agar post hi nahi mili
@@ -211,15 +182,13 @@ class PostController extends BaseController
         // return response()->json([
         //     'status' => 'true',
         //     'message' => 'Your Post has been removed Successfully',
-
         // ], 200);
-        return  $this()->sendResponse($post, 'Your Post has been removed Successfully');
+        return $this->sendResponse($post, 'Your Post has been removed Successfully');
 
         //Step 1: Database se us post ki image ka naam lo (jo id ke saath match karta hai).
         //Step 2: Image ka full path banao (public/uploads + image name).
         //Step 3: Us image ko server se delete karo (unlink).
         //Step 4: Post record ko database se delete karo.
         //JSON response bhejo → confirm karo ke post aur uski image successfully remove ho gayi.
-
     }
 }

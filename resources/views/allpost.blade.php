@@ -255,50 +255,10 @@
 
             <!-- Data table -->
             <div class="panel">
-                <div class="table-wrap">
-                    <table role="table" aria-label="Posts">
-                        <thead>
-                            <tr>
-                                <th>Image</th>
-                                <th>Title</th>
-                                <th>Description</th>
-                                <th>Update</th>
-                                <th>View</th>
-                                <th>Delete</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Row 1 -->
-                            <tr>
-                                <td><img class="thumb" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=240" alt="Post image"></td>
-                                <td class="title">Getting Started Guide</td>
-                                <td class="desc">Short walkthrough to create your first post, upload an image, and publish safely.</td>
-                                <td><button class="btn chip outline" type="button">Update</button></td>
-                                <td><button class="btn chip outline" type="button">View</button></td>
-                                <td><button class="btn chip outline" type="button">Delete</button></td>
-                            </tr>
-                            <!-- Row 2 -->
-                            <tr>
-                                <td><img class="thumb" src="https://images.unsplash.com/photo-1487014679447-9f8336841d58?q=80&w=240" alt="Post image"></td>
-                                <td class="title">Design Tips</td>
-                                <td class="desc">Clean UI with subtle shadows, rounded corners, and sensible spacing for readability.
-                                </td>
-                                <td><button class="btn chip outline" type="button">Update</button></td>
-                                <td><button class="btn chip outline" type="button">View</button></td>
-                                <td><button class="btn chip outline" type="button">Delete</button></td>
-                            </tr>
-                            <!-- Row 3 -->
-                            <tr>
-                                <td><img class="thumb" src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=240" alt="Post image"></td>
-                                <td class="title">Release Notes v1.0</td>
-                                <td class="desc">Initial dashboard layout with header, buttons, and posts table (image, title,
-                                    description, actions).</td>
-                                <td><button class="btn chip outline" type="button">Update</button></td>
-                                <td><button class="btn chip outline" type="button">View</button></td>
-                                <td><button class="btn chip outline" type="button">Delete</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="table-wrap" id="postscontainer">
+
+
+
                 </div>
             </div>
         </div>
@@ -338,35 +298,73 @@
 
     <script>
         function loadData() {
-    const token = localStorage.getItem('api_token');
+            const token = localStorage.getItem('api_token');
 
-    if (!token) {
-        console.error("No token found. Please login first.");
-        // maybe redirect to login page:
-        // window.location.href = "/login";
-        return;
-    }
+            if (!token) {
+                console.error("No token found. Please login first.");
+                // maybe redirect to login page:
+                // window.location.href = "/login";
+                return;
+            }
 
-    fetch('/api/posts', {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
+            fetch('/api/posts', {
+                    method: 'GET'
+                    , headers: {
+                        'Authorization': `Bearer ${token}`
+                    , }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Posts loaded:", data.data.posts);
+                    //table kid is ko target kya 
+                    const postContainer = document.querySelector("#postscontainer");
+                    // store variable in this the data  'data.data.posts'
+                    const allpost = data.data.posts
+
+                    var tabledata = `<table role="table" aria-label="Posts">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Update</th>
+                                <th>View</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>`;
+
+                    allpost.forEach(post => {
+
+                       tabledata += `<tbody>
+                            <!-- Row 1 -->
+                            <tr>
+                                <td><img class="thumb" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=240" alt="Post image"></td>
+                                <td class="title">${post.title}</td>
+                                <td class="desc">${post.description}</td>
+                                <td><button class="btn chip outline" type="button">Update</button></td>
+                                <td><button class="btn chip outline" type="button">View</button></td>
+                                <td><button class="btn chip outline" type="button">Delete</button></td>
+                            </tr>
+                        </tbody>`
+
+                    });
+
+                    tabledata += `</table>`;
+
+                    //
+                    postContainer.innerHTML  = tabledata;
+
+
+                })
+                .catch(error => console.error('Error fetching posts:', error));
         }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("Posts loaded:", data);
-    })
-    .catch(error => console.error('Error fetching posts:', error));
-}
 
-loadData();
-
+        loadData();
 
     </script>
 
