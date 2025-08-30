@@ -281,6 +281,38 @@
     </div>
 
 
+    <!--  Update Post show  Modal -->
+    <div class="modal fade" id="updatePostModal" tabindex="-1" aria-labelledby="updatePostLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="updatePostLabel">Update Post</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+
+                <form id="updateform">
+                    <div class="modal-body">
+
+                        <input type="text" id="PostId" class="form-control" value="">
+                        <b>Title</b><input type="text" id="PostTitle" class="form-control" value="">
+                        <b>Description</b><input type="text" id="PostBody" class="form-control" value="">
+                        <img id="showImage" width="150px">
+                        <b>Upload Image</b><input type="file" id="PostImage" class="form-control">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <input type="submit"  value="Save changes" class="btn btn-primary">
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+
+
 
 
 
