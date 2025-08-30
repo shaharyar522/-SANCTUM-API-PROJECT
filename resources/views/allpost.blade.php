@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <title>Simple Data Dashboard</title>
     <style>
         :root {
@@ -228,7 +229,6 @@
                 max-width: 360px;
             }
         }
-
     </style>
 </head>
 
@@ -256,19 +256,35 @@
             <!-- Data table -->
             <div class="panel">
                 <div class="table-wrap" id="postscontainer">
-
-
-
                 </div>
             </div>
         </div>
     </main>
 
+    <!--  Single Post show  Modal -->
+    <div class="modal fade" id="singlePostModal" tabindex="-1" aria-labelledby="singlePostLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="singlePostLabel">Single Post</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
 
 
+    <script src="	https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 
     <script>
@@ -320,7 +336,7 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log("Posts loaded:", data.data.posts);
+
                     //table kid is ko target kya 
                     const postContainer = document.querySelector("#postscontainer");
                     // store variable in this the data  'data.data.posts'
@@ -340,14 +356,14 @@
 
                     allpost.forEach(post => {
 
-                       tabledata += `<tbody>
+                        tabledata += `<tbody>
                             <!-- Row 1 -->
                             <tr>
-                                <td><img class="thumb" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=240" alt="Post image"></td>
+                                <td><img class="thumb" src="/uploads/${post.image}" alt="Post image"></td>
                                 <td class="title">${post.title}</td>
                                 <td class="desc">${post.description}</td>
-                                <td><button class="btn chip outline" type="button">Update</button></td>
-                                <td><button class="btn chip outline" type="button">View</button></td>
+                                <td><button class="btn chip outline" type="button" data-bs-toggle="modal"  data-bs-postid="${post.id}"  data-bs-target="#singlePostModal">View</button></td>
+                                <td><button class="btn chip outline" type="button"  data-bs-toggle="modal"  data-bs-postid="${post.id}"  data-bs-target="#updatePostModal">Update</button></td>
                                 <td><button class="btn chip outline" type="button">Delete</button></td>
                             </tr>
                         </tbody>`
@@ -357,7 +373,7 @@
                     tabledata += `</table>`;
 
                     //
-                    postContainer.innerHTML  = tabledata;
+                    postContainer.innerHTML = tabledata;
 
 
                 })
@@ -366,7 +382,57 @@
 
         loadData();
 
+
+
+        //Open single Post  Modal
+        //// Select the modal
+        var singleModal = document.querySelector("#singlePostModal");
+
+        if (singleModal) {
+
+            // Listen for the "show" event of Bootstrap modal
+            singleModal.addEventListener('show.bs.modal', event => {
+                // Get the button that opened the modal
+                const button = event.relatedTarget
+                // Extract post ID from button attribute
+                const id = button.getAttribute('data-bs-postid')
+
+                // Get auth token from localStorage
+                const token = localStorage.getItem('api_token');
+
+                if (!token) {
+                    console.error("No token found. Please login first.");
+                    // maybe redirect to login page:
+                    // window.location.href = "/login";
+                    return;
+                }
+                // Fetch the single post from backend
+                fetch(`/api/posts/${id}`, {
+                        method: 'GET',
+                         headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Extract post object
+                        const post = data.data.post;
+
+                        const modalBoday = document.querySelector("#singlePostModal .modal-body");
+                        // Clear old content
+                        modalBoday.innerHTML = "";
+                        // Insert new content (title, description, image)
+                        modalBoday.innerHTML = `
+                           <strong>Title:</strong> ${post.title} <br>
+                           <strong>Description:</strong> ${post.description} <br>
+                           <img width="150px" src="http://localhost:8000/uploads/${post.image}" />
+                        `;
+                    });
+            });
+        }
     </script>
+
 
 </body>
 
