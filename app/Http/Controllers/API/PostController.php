@@ -112,7 +112,7 @@ class PostController extends BaseController
             [
                 'title' => 'required',
                 'description' => 'required',
-                'image' => 'required|mimes:png,jpg,jpeg,gif',
+                'image' => 'nullable|image|mimes:png,jpg,jpeg,gif',
             ]
         );
 

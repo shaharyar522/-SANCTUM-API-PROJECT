@@ -395,7 +395,7 @@
                                 <td class="desc">${post.description}</td>
                                 <td><button class="btn chip outline" type="button" data-bs-toggle="modal"  data-bs-postid="${post.id}"  data-bs-target="#singlePostModal">View</button></td>
                                 <td><button class="btn chip outline" type="button"  data-bs-toggle="modal"  data-bs-postid="${post.id}"  data-bs-target="#updatePostModal">Update</button></td>
-                                <td><button class="btn chip outline" type="button">Delete</button></td>
+                                <td><button class="btn chip outline" onclick="deletePost(${post.id})" type="button">Delete</button></td>
                             </tr>
                         </tbody>`
 
@@ -427,8 +427,8 @@
                 const button = event.relatedTarget // trigle the buttun.
 
                 const id = button.getAttribute(
-                        'data-bs-postid'
-                        ) // user jid behi buttun par click karay ga us k related data ko show karwana hian mohjy.
+                    'data-bs-postid'
+                ) // user jid behi buttun par click karay ga us k related data ko show karwana hian mohjy.
 
                 // Get auth token from localStorage
                 const token = localStorage.getItem('api_token');
@@ -476,7 +476,8 @@
                 const button = event.relatedTarget // trigle the buttun.
 
                 const id = button.getAttribute(
-                    'data-bs-postid') // user jid behi buttun par click karay ga us k related data ko show karwana hian mohjy.
+                    'data-bs-postid'
+                ) // user jid behi buttun par click karay ga us k related data ko show karwana hian mohjy.
 
                 const token = localStorage.getItem('api_token');
 
@@ -513,6 +514,15 @@
 
 
             });
+
+
+
+
+
+
+
+
+
         }
     </script>
 
@@ -530,7 +540,7 @@
             const title = document.querySelector("#PostTitle").value; // ✅ note: .value (not .value())
             const description = document.querySelector("#PostBody").value; // ✅
 
-           
+
 
             //all form store in js Form Data
             var formData = new FormData();
@@ -538,15 +548,15 @@
             formData.append("id", PostId);
             formData.append("title", title);
             formData.append("description", description);
-           
-             if (!document.querySelector("#PostImage").files[0] == "") {
+
+            if (!document.querySelector("#PostImage").files[0] == "") {
                 const image = document.querySelector("#PostImage").files[0];
-                 formData.append("image", image);
-            }   // agr user  ny upload ki hain tu us ko append karo ga warna main es ko nhi karo ga.
+                formData.append("image", image);
+            } // agr user  ny upload ki hain tu us ko append karo ga warna main es ko nhi karo ga.
 
 
-            let response = await fetch('/api/posts', {
-                    method: 'POST',
+            let response = await fetch(`/api/posts/${PostId}`, {
+                    method: 'POST', // or PATCH (see below)
                     body: formData,
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -554,12 +564,36 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
+
                     window.location.href = "http://localhost:8000/allpost";
                 });
 
         }
+
+
+      
+
+        
     </script>
+
+
+<script>
+  //Delete Post
+        async function deletePost(PostId) {
+            const token = localStorage.getItem('api_token');
+            let response = await fetch(`/api/posts/${PostId}`, {
+                    method: 'DELETE', // or PATCH (see below)
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    // window.location.href = "http://localhost:8000/allpost";
+                });
+            }
+</script>
 
 
 </body>
