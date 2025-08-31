@@ -222,6 +222,7 @@
         $(document).ready(function() {
             // attach submit event to form, not button
             $("#loginForm").on("submit", function(e) {
+                
                 e.preventDefault();
 
                 let email = $("#email").val();
@@ -250,6 +251,8 @@
         });
 
     </script>
+
+
 
 
 </body>

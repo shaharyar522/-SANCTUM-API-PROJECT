@@ -248,7 +248,7 @@
             <div class="toolbar">
                 <h1>All Post</h1>
                 <div class="actions">
-                    <a class="btn primary" href="{{route('addpost')}}" aria-label="Add New Post">➕ Add New</a>
+                    <a class="btn primary" href="{{ route('addpost') }}" aria-label="Add New Post">➕ Add New</a>
                     <button class="btn danger" id="logoutBtn" aria-label="Logout">⏻ Logout</button>
                 </div>
             </div>
@@ -290,23 +290,20 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-
                 <form id="updateform">
                     <div class="modal-body">
 
-                        <input type="text" id="PostId" class="form-control" value="">
+                        <input type="hidden" id="PostId" class="form-control" value="">
                         <b>Title</b><input type="text" id="PostTitle" class="form-control" value="">
                         <b>Description</b><input type="text" id="PostBody" class="form-control" value="">
                         <img id="showImage" width="150px">
                         <b>Upload Image</b><input type="file" id="PostImage" class="form-control">
-
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <input type="submit"  value="Save changes" class="btn btn-primary">
+                        <input type="submit" value="Save changes" class="btn btn-primary">
                     </div>
                 </form>
-
 
             </div>
         </div>
@@ -326,10 +323,10 @@
             const token = localStorage.getItem('api_token');
 
             fetch('/api/logout/', {
-                    method: 'POST'
-                    , headers: {
-                        'Authorization': `Bearer ${token}`
-                        , 'Content-Type': 'application/json'
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
                     }
                 })
                 .then(response => response.json())
@@ -339,7 +336,6 @@
                 })
                 .catch(error => console.error('Error:', error));
         });
-
     </script>
 
     {{-- now used form to show table dat --}}
@@ -357,14 +353,14 @@
             }
 
             fetch('/api/posts', {
-                    method: 'GET'
-                    , headers: {
-                        'Authorization': `Bearer ${token}`
-                    , }
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    }
                 })
                 .then(response => {
 
-                    if(!response.ok) {
+                    if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
                     return response.json();
@@ -428,9 +424,11 @@
             // Listen for the "show" event of Bootstrap modal
             singleModal.addEventListener('show.bs.modal', event => {
                 // Get the button that opened the modal
-                const button = event.relatedTarget
-                // Extract post ID from button attribute
-                const id = button.getAttribute('data-bs-postid')
+                const button = event.relatedTarget // trigle the buttun.
+
+                const id = button.getAttribute(
+                        'data-bs-postid'
+                        ) // user jid behi buttun par click karay ga us k related data ko show karwana hian mohjy.
 
                 // Get auth token from localStorage
                 const token = localStorage.getItem('api_token');
@@ -442,9 +440,9 @@
                     return;
                 }
                 // Fetch the single post from backend
-                fetch(`/api/posts/${id}`,{
+                fetch(`/api/posts/${id}`, {
                         method: 'GET',
-                         headers: {
+                        headers: {
                             'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json'
                         }
@@ -465,6 +463,100 @@
                         `;
                     });
             });
+
+        }
+    </script>
+
+    {{-- update post show data in modaal part-1 just open modal and show data throw id --}}
+    <script>
+        const updatePostModal = document.getElementById('updatePostModal')
+        if (updatePostModal) {
+            updatePostModal.addEventListener('show.bs.modal', event => {
+
+                const button = event.relatedTarget // trigle the buttun.
+
+                const id = button.getAttribute(
+                    'data-bs-postid') // user jid behi buttun par click karay ga us k related data ko show karwana hian mohjy.
+
+                const token = localStorage.getItem('api_token');
+
+                if (!token) {
+                    console.error("No token found. Please login first.");
+                    // maybe redirect to login page:
+                    // window.location.href = "/login";
+                    return;
+                }
+
+                // Fetch the single post from backend
+                fetch(`/api/posts/${id}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Extract post object
+                        const post = data.data.post;
+
+                        //bucause you show the data in modal 
+                        document.querySelector("#PostId").value = post.id;
+                        document.querySelector("#PostTitle").value = post.title;
+                        document.querySelector("#PostBody").value = post.description;
+                        document.querySelector("#showImage").src = `/uploads/${post.image}`;
+
+
+                    });
+
+
+
+
+            });
+        }
+    </script>
+
+    {{-- update post after user some add in update in database proplery part-2 --}}
+    <script>
+        var updateform = document.querySelector("#updateform"); // ✅ correct
+
+
+        updateform.onsubmit = async (e) => {
+            e.preventDefault();
+
+            const token = localStorage.getItem('api_token');
+
+            const PostId = document.querySelector("#PostId").value; // ✅ note: .value (not .value())
+            const title = document.querySelector("#PostTitle").value; // ✅ note: .value (not .value())
+            const description = document.querySelector("#PostBody").value; // ✅
+
+           
+
+            //all form store in js Form Data
+            var formData = new FormData();
+
+            formData.append("id", PostId);
+            formData.append("title", title);
+            formData.append("description", description);
+           
+             if (!document.querySelector("#PostImage").files[0] == "") {
+                const image = document.querySelector("#PostImage").files[0];
+                 formData.append("image", image);
+            }   // agr user  ny upload ki hain tu us ko append karo ga warna main es ko nhi karo ga.
+
+
+            let response = await fetch('/api/posts', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    window.location.href = "http://localhost:8000/allpost";
+                });
 
         }
     </script>
